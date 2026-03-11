@@ -1,0 +1,68 @@
+const mongoose = require('mongoose');
+
+const goalItemSchema = new mongoose.Schema(
+  {
+    text: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    done: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  { _id: false }
+);
+
+const goalSchema = new mongoose.Schema(
+  {
+    daily: {
+      type: Number,
+      default: 3,
+      min: 0,
+    },
+    weekly: {
+      type: Number,
+      default: 15,
+      min: 0,
+    },
+    monthly: {
+      type: Number,
+      default: 60,
+      min: 0,
+    },
+    dailyText: {
+      type: String,
+      default: '',
+      trim: true,
+    },
+    weeklyText: {
+      type: String,
+      default: '',
+      trim: true,
+    },
+    monthlyText: {
+      type: String,
+      default: '',
+      trim: true,
+    },
+    dailyItems: {
+      type: [goalItemSchema],
+      default: [],
+    },
+    weeklyItems: {
+      type: [goalItemSchema],
+      default: [],
+    },
+    monthlyItems: {
+      type: [goalItemSchema],
+      default: [],
+    },
+  },
+  {
+    timestamps: true,
+  }
+);
+
+module.exports = mongoose.model('Goal', goalSchema);
