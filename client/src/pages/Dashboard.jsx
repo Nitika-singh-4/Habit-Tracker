@@ -121,8 +121,10 @@ const Dashboard = () => {
     if (!text) return;
 
     const key = `${type}Items`;
+    const goalKey = type;
     setGoals((prev) => ({
       ...prev,
+      [goalKey]: Math.max(0, Number(prev[goalKey]) || 0, prev[key].length + 1),
       [key]: [...prev[key], { text, done: false, linkedSubjectId: '', linkedTopicId: '' }],
     }));
     setNewGoalText((prev) => ({ ...prev, [type]: '' }));
@@ -159,6 +161,7 @@ const Dashboard = () => {
 
     setGoals((prev) => ({
       ...prev,
+      daily: Math.max(0, Number(prev.daily) || 0, prev.dailyItems.length + 1),
       dailyItems: [
         ...prev.dailyItems,
         {
@@ -212,15 +215,31 @@ const Dashboard = () => {
   const weekCompletedCount = countCompletedInRange(weekStartDate, todayDate);
   const monthCompletedCount = countCompletedInRange(monthStartDate, todayDate);
 
+  const dailyChecklistTotal = goals.dailyItems.length;
+  const weeklyChecklistTotal = goals.weeklyItems.length;
+  const monthlyChecklistTotal = goals.monthlyItems.length;
+
+  const dailyChecklistDone = goals.dailyItems.filter((item) => item.done).length;
+  const weeklyChecklistDone = goals.weeklyItems.filter((item) => item.done).length;
+  const monthlyChecklistDone = goals.monthlyItems.filter((item) => item.done).length;
+
+  const effectiveDailyGoal = dailyChecklistTotal > 0 ? dailyChecklistTotal : goals.daily;
+  const effectiveWeeklyGoal = weeklyChecklistTotal > 0 ? weeklyChecklistTotal : goals.weekly;
+  const effectiveMonthlyGoal = monthlyChecklistTotal > 0 ? monthlyChecklistTotal : goals.monthly;
+
+  const effectiveTodayCompleted = dailyChecklistTotal > 0 ? dailyChecklistDone : todayCompletedCount;
+  const effectiveWeekCompleted = weeklyChecklistTotal > 0 ? weeklyChecklistDone : weekCompletedCount;
+  const effectiveMonthCompleted = monthlyChecklistTotal > 0 ? monthlyChecklistDone : monthCompletedCount;
+
   const safePercent = (value) => Math.max(0, Math.min(100, Math.round(value)));
-  const todayGoalProgress = goals.daily > 0
-    ? safePercent((todayCompletedCount / goals.daily) * 100)
+  const todayGoalProgress = effectiveDailyGoal > 0
+    ? safePercent((effectiveTodayCompleted / effectiveDailyGoal) * 100)
     : 0;
-  const weeklyGoalProgress = goals.weekly > 0
-    ? safePercent((weekCompletedCount / goals.weekly) * 100)
+  const weeklyGoalProgress = effectiveWeeklyGoal > 0
+    ? safePercent((effectiveWeekCompleted / effectiveWeeklyGoal) * 100)
     : 0;
-  const monthlyGoalProgress = goals.monthly > 0
-    ? safePercent((monthCompletedCount / goals.monthly) * 100)
+  const monthlyGoalProgress = effectiveMonthlyGoal > 0
+    ? safePercent((effectiveMonthCompleted / effectiveMonthlyGoal) * 100)
     : 0;
 
   const todayProgress = todayGoalProgress;
@@ -295,18 +314,18 @@ const Dashboard = () => {
     {
       title: 'Weekly Progress',
       percentage: weeklyProgress,
-      current: weekCompletedCount,
-      goal: goals.weekly,
-      remaining: Math.max((goals.weekly || 0) - weekCompletedCount, 0),
+      current: effectiveWeekCompleted,
+      goal: effectiveWeeklyGoal,
+      remaining: Math.max((effectiveWeeklyGoal || 0) - effectiveWeekCompleted, 0),
       tone: 'from-violet-100 to-indigo-100',
       accent: 'bg-indigo-500',
     },
     {
       title: 'Monthly Progress',
       percentage: monthlyProgress,
-      current: monthCompletedCount,
-      goal: goals.monthly,
-      remaining: Math.max((goals.monthly || 0) - monthCompletedCount, 0),
+      current: effectiveMonthCompleted,
+      goal: effectiveMonthlyGoal,
+      remaining: Math.max((effectiveMonthlyGoal || 0) - effectiveMonthCompleted, 0),
       tone: 'from-orange-100 to-amber-100',
       accent: 'bg-amber-500',
     },
@@ -408,8 +427,8 @@ const Dashboard = () => {
         <div className="mb-8 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
           <TodayProgressRing
             percentage={todayProgress}
-            completedCount={todayCompletedCount}
-            totalCount={goals.daily}
+            completedCount={effectiveTodayCompleted}
+            totalCount={effectiveDailyGoal}
           />
 
           {progressCards.map((card) => (
@@ -612,7 +631,7 @@ const Dashboard = () => {
                 ))}
               </div>
               <p className="mt-2 text-xs font-medium text-slate-600">
-                This week: {weekCompletedCount} completed, {Math.max((goals.weekly || 0) - weekCompletedCount, 0)} remaining
+                This week: {effectiveWeekCompleted} completed, {Math.max((effectiveWeeklyGoal || 0) - effectiveWeekCompleted, 0)} remaining
               </p>
             </div>
 
@@ -669,7 +688,7 @@ const Dashboard = () => {
                 ))}
               </div>
               <p className="mt-2 text-xs font-medium text-slate-600">
-                This month: {monthCompletedCount} completed, {Math.max((goals.monthly || 0) - monthCompletedCount, 0)} remaining
+                This month: {effectiveMonthCompleted} completed, {Math.max((effectiveMonthlyGoal || 0) - effectiveMonthCompleted, 0)} remaining
               </p>
             </div>
           </div>
