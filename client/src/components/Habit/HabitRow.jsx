@@ -18,7 +18,7 @@ const HabitRow = ({ habitName, days, completedData, toggleHabit }) => {
 						<HabitCheckbox
 							checked={isChecked}
 							onToggle={() => toggleHabit(habitName, day.value)}
-							label={`${habitName} day ${day.value}`}
+							label={`${habitName} on ${day.value}`}
 						/>
 					</td>
 				);
