@@ -176,11 +176,8 @@ const Dashboard = () => {
 
   const isCompletedForDate = (habit, date) => {
     const isoDate = date.toISOString().split('T')[0];
-    const day = date.getDay() === 0 ? 7 : date.getDay();
-
     const dateKey = `${habit}-${isoDate}`;
-    const dayKey = `${habit}-${day}`;
-    return Boolean(completed[dateKey] ?? completed[dayKey]);
+    return Boolean(completed[dateKey]);
   };
 
   const countCompletedForDate = (date) => {
@@ -190,19 +187,30 @@ const Dashboard = () => {
     );
   };
 
-  const countCompletedForWindow = (days) => {
+  const countCompletedInRange = (startDate, endDate) => {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    start.setHours(0, 0, 0, 0);
+    end.setHours(0, 0, 0, 0);
+
     let total = 0;
-    for (let offset = 0; offset < days; offset += 1) {
-      const date = new Date(todayDate);
-      date.setDate(todayDate.getDate() - offset);
+    for (let date = new Date(start); date <= end; date.setDate(date.getDate() + 1)) {
       total += countCompletedForDate(date);
     }
+
     return total;
   };
 
+  const weekStartDate = new Date(todayDate);
+  const currentJsDay = todayDate.getDay();
+  const mondayOffset = currentJsDay === 0 ? -6 : 1 - currentJsDay;
+  weekStartDate.setDate(todayDate.getDate() + mondayOffset);
+
+  const monthStartDate = new Date(todayDate.getFullYear(), todayDate.getMonth(), 1);
+
   const todayCompletedCount = countCompletedForDate(todayDate);
-  const weekCompletedCount = countCompletedForWindow(7);
-  const monthCompletedCount = countCompletedForWindow(30);
+  const weekCompletedCount = countCompletedInRange(weekStartDate, todayDate);
+  const monthCompletedCount = countCompletedInRange(monthStartDate, todayDate);
 
   const safePercent = (value) => Math.max(0, Math.min(100, Math.round(value)));
   const todayGoalProgress = goals.daily > 0
@@ -260,12 +268,10 @@ const Dashboard = () => {
   const currentStreak = useMemo(() => {
     const checkDayCompletion = (date) => {
       const isoDate = date.toISOString().split('T')[0];
-      const day = date.getDay() === 0 ? 7 : date.getDay();
 
       return habits.some((habit) => {
         const dateKey = `${habit}-${isoDate}`;
-        const dayKey = `${habit}-${day}`;
-        return Boolean(completed[dateKey] ?? completed[dayKey]);
+        return Boolean(completed[dateKey]);
       });
     };
 
@@ -291,6 +297,7 @@ const Dashboard = () => {
       percentage: weeklyProgress,
       current: weekCompletedCount,
       goal: goals.weekly,
+      remaining: Math.max((goals.weekly || 0) - weekCompletedCount, 0),
       tone: 'from-violet-100 to-indigo-100',
       accent: 'bg-indigo-500',
     },
@@ -299,6 +306,7 @@ const Dashboard = () => {
       percentage: monthlyProgress,
       current: monthCompletedCount,
       goal: goals.monthly,
+      remaining: Math.max((goals.monthly || 0) - monthCompletedCount, 0),
       tone: 'from-orange-100 to-amber-100',
       accent: 'bg-amber-500',
     },
@@ -412,7 +420,7 @@ const Dashboard = () => {
               <h2 className="text-sm font-semibold text-slate-700">{card.title}</h2>
               <p className="mb-3 mt-1 text-4xl font-black text-slate-900">{card.percentage}%</p>
               <p className="mb-3 text-xs font-semibold text-slate-500">
-                {card.current} / {card.goal || 0} goal completions
+                Completed: {card.current} | Remaining: {card.remaining}
               </p>
               <div className="h-2.5 w-full rounded-full bg-white/70">
                 <div
@@ -604,7 +612,7 @@ const Dashboard = () => {
                 ))}
               </div>
               <p className="mt-2 text-xs font-medium text-slate-600">
-                Current: {weekCompletedCount} completions in last 7 days
+                This week: {weekCompletedCount} completed, {Math.max((goals.weekly || 0) - weekCompletedCount, 0)} remaining
               </p>
             </div>
 
@@ -661,7 +669,7 @@ const Dashboard = () => {
                 ))}
               </div>
               <p className="mt-2 text-xs font-medium text-slate-600">
-                Current: {monthCompletedCount} completions in last 30 days
+                This month: {monthCompletedCount} completed, {Math.max((goals.monthly || 0) - monthCompletedCount, 0)} remaining
               </p>
             </div>
           </div>
