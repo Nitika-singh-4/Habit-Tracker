@@ -11,7 +11,7 @@ const app = express();
 const PORT = Number(process.env.PORT) || 5000;
 const MAX_PORT_RETRIES = 5;
 
-app.use(cors({ origin: process.env.CLIENT_URL || 'http://localhost:5173' }));
+app.use(cors({ origin: process.env.CLIENT_URL || 'https://habit-tracker-snowy-psi.vercel.app/' }));
 app.use(express.json());
 
 app.get('/', (_req, res) => {
