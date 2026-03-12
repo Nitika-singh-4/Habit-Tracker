@@ -11,9 +11,9 @@ import { calculateMonthlyProgress } from '../utils/progressCalculator';
 import useHabits from '../hooks/useHabits';
 
 const DEFAULT_GOALS = {
-  daily: 3,
-  weekly: 15,
-  monthly: 60,
+  daily: 0,
+  weekly: 0,
+  monthly: 0,
   dailyText: '',
   weeklyText: '',
   monthlyText: '',

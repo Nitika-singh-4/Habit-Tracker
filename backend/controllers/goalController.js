@@ -1,17 +1,5 @@
 const Goal = require('../models/goal');
 
-const defaultGoals = {
-  daily: 3,
-  weekly: 15,
-  monthly: 60,
-  dailyText: '',
-  weeklyText: '',
-  monthlyText: '',
-  dailyItems: [],
-  weeklyItems: [],
-  monthlyItems: [],
-};
-
 const normalizeItems = (items) => {
   if (!Array.isArray(items)) return [];
 
@@ -29,7 +17,7 @@ const getGoals = async (_req, res) => {
   let goals = await Goal.findOne();
 
   if (!goals) {
-    goals = await Goal.create(defaultGoals);
+    goals = await Goal.create({});
   }
 
   return res.status(200).json(goals);
@@ -51,7 +39,7 @@ const updateGoals = async (req, res) => {
   const existing = await Goal.findOne();
 
   if (!existing) {
-    const created = await Goal.create({ ...defaultGoals, ...payload });
+    const created = await Goal.create(payload);
     return res.status(200).json(created);
   }
 

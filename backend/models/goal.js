@@ -29,17 +29,17 @@ const goalSchema = new mongoose.Schema(
   {
     daily: {
       type: Number,
-      default: 3,
+      default: 0,
       min: 0,
     },
     weekly: {
       type: Number,
-      default: 15,
+      default: 0,
       min: 0,
     },
     monthly: {
       type: Number,
-      default: 60,
+      default: 0,
       min: 0,
     },
     dailyText: {
