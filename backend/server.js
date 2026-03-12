@@ -8,7 +8,8 @@ const goalRoutes = require('./routes/goalRoutes');
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = Number(process.env.PORT) || 5000;
+const MAX_PORT_RETRIES = 5;
 
 app.use(cors({ origin: process.env.CLIENT_URL || 'http://localhost:5173' }));
 app.use(express.json());
@@ -25,12 +26,32 @@ app.use((error, _req, res, _next) => {
 	res.status(500).json({ message: 'Internal server error.' });
 });
 
+const startListening = (startPort, retriesLeft) => {
+	return new Promise((resolve, reject) => {
+		const server = app.listen(startPort, () => {
+			resolve({ server, port: startPort });
+		});
+
+		server.on('error', (error) => {
+			if (error.code === 'EADDRINUSE' && retriesLeft > 0) {
+				const nextPort = startPort + 1;
+				console.warn(
+					`Port ${startPort} is in use. Retrying with port ${nextPort}...`
+				);
+				resolve(startListening(nextPort, retriesLeft - 1));
+				return;
+			}
+
+			reject(error);
+		});
+	});
+};
+
 const startServer = async () => {
 	try {
 		await connectDB();
-		app.listen(PORT, () => {
-			console.log(`Server running on port ${PORT}`);
-		});
+		const { port } = await startListening(PORT, MAX_PORT_RETRIES);
+		console.log(`Server running on port ${port}`);
 	} catch (error) {
 		console.error('Failed to start server:', error.message);
 		process.exit(1);

@@ -3,7 +3,9 @@ import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
-const WeeklyAnalytics = ({ completed }) => {
+const isIsoDate = (value) => /^\d{4}-\d{2}-\d{2}$/.test(String(value));
+
+const WeeklyAnalytics = ({ subjects = [] }) => {
   const last7Days = Array.from({ length: 7 }, (_, index) => {
     const date = new Date();
     date.setHours(0, 0, 0, 0);
@@ -24,26 +26,25 @@ const WeeklyAnalytics = ({ completed }) => {
   const dayNumberIndexMap = new Map(last7Days.map((day, index) => [day.dayNumber, index]));
   const completionsByDay = Array(7).fill(0);
 
-  Object.entries(completed).forEach(([key, isCompleted]) => {
-    if (!isCompleted) return;
+  subjects.forEach((subject) => {
+    const topics = Array.isArray(subject?.topics) ? subject.topics : [];
 
-    const keySeparatorIndex = key.lastIndexOf('-');
-    if (keySeparatorIndex === -1) return;
+    topics.forEach((topic) => {
+      if (!topic?.completed) return;
 
-    const dayPart = key.slice(keySeparatorIndex + 1);
+      const completedDate = String(topic?.completedDate || '');
+      if (isIsoDate(completedDate) && dateIndexMap.has(completedDate)) {
+        const dateIndex = dateIndexMap.get(completedDate);
+        completionsByDay[dateIndex] += 1;
+        return;
+      }
 
-    if (dateIndexMap.has(dayPart)) {
-      const dateIndex = dateIndexMap.get(dayPart);
-      completionsByDay[dateIndex] += 1;
-      return;
-    }
+      const dayNumber = Number(topic?.id);
+      if (!Number.isInteger(dayNumber) || !dayNumberIndexMap.has(dayNumber)) return;
 
-    const dayNumber = Number(dayPart);
-    if (!Number.isInteger(dayNumber)) return;
-    if (!dayNumberIndexMap.has(dayNumber)) return;
-
-    const dayIndex = dayNumberIndexMap.get(dayNumber);
-    completionsByDay[dayIndex] += 1;
+      const dayIndex = dayNumberIndexMap.get(dayNumber);
+      completionsByDay[dayIndex] += 1;
+    });
   });
 
   const data = {

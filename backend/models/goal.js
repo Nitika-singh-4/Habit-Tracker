@@ -11,6 +11,16 @@ const goalItemSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    linkedSubjectId: {
+      type: String,
+      default: '',
+      trim: true,
+    },
+    linkedTopicId: {
+      type: String,
+      default: '',
+      trim: true,
+    },
   },
   { _id: false }
 );

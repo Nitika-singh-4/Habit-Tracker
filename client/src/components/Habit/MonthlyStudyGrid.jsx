@@ -14,13 +14,11 @@ const MonthlyStudyGrid = ({ habits, completed }) => {
     const now = new Date();
     const date = new Date(now.getFullYear(), now.getMonth(), dayOfMonth);
     const isoDate = date.toISOString().split('T')[0];
-    const dayOfWeek = date.getDay();
-    const dayNumber = dayOfWeek === 0 ? 7 : dayOfWeek;
 
     const byDateKey = `${habit}-${isoDate}`;
-    const byDayNumberKey = `${habit}-${dayNumber}`;
+    const byDayOfMonthKey = `${habit}-${dayOfMonth}`;
 
-    return Boolean(completed[byDateKey] ?? completed[byDayNumberKey]);
+    return Boolean(completed[byDateKey] ?? completed[byDayOfMonthKey]);
   };
 
   return (

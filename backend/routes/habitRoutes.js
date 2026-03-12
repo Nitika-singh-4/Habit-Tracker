@@ -5,12 +5,13 @@ const {
 	updateHabit,
 	deleteHabit,
 } = require('../controllers/habitController');
+const asyncHandler = require('../middleware/asyncHandler');
 
 const router = express.Router();
 
-router.get('/', getHabits);
-router.post('/', createHabit);
-router.put('/:id', updateHabit);
-router.delete('/:id', deleteHabit);
+router.get('/', asyncHandler(getHabits));
+router.post('/', asyncHandler(createHabit));
+router.put('/:id', asyncHandler(updateHabit));
+router.delete('/:id', asyncHandler(deleteHabit));
 
 module.exports = router;

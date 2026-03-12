@@ -19,6 +19,8 @@ const normalizeItems = (items) => {
     .map((item) => ({
       text: String(item?.text || '').trim(),
       done: Boolean(item?.done),
+      linkedSubjectId: String(item?.linkedSubjectId || '').trim(),
+      linkedTopicId: String(item?.linkedTopicId || '').trim(),
     }))
     .filter((item) => item.text.length > 0);
 };

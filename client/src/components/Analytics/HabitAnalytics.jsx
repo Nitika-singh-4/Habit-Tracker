@@ -3,21 +3,15 @@ import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Toolti
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
-const HabitAnalytics = ({ habits, completed }) => {
-  const completionCounts = habits.map((habit) => {
-    const habitPrefix = `${habit}-`;
-
-    return Object.entries(completed).reduce((count, [key, isDone]) => {
-      if (key.startsWith(habitPrefix) && isDone) {
-        return count + 1;
-      }
-
-      return count;
-    }, 0);
+const HabitAnalytics = ({ subjects = [] }) => {
+  const labels = subjects.map((subject) => subject?.name || 'Untitled Subject');
+  const completionCounts = subjects.map((subject) => {
+    const topics = Array.isArray(subject?.topics) ? subject.topics : [];
+    return topics.reduce((count, topic) => count + (topic?.completed ? 1 : 0), 0);
   });
 
   const data = {
-    labels: habits,
+    labels,
     datasets: [
       {
         label: 'Completions',

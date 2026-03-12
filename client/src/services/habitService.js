@@ -1,7 +1,8 @@
 import axios from 'axios';
 
-const HABITS_API_URL = 'http://localhost:5000/api/habits';
-const GOALS_API_URL = 'http://localhost:5000/api/goals';
+const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000').replace(/\/+$/, '');
+const HABITS_API_URL = `${API_BASE_URL}/api/habits`;
+const GOALS_API_URL = `${API_BASE_URL}/api/goals`;
 
 export const getHabits = async () => {
 	const response = await axios.get(HABITS_API_URL);

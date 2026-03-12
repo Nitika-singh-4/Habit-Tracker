@@ -9,7 +9,7 @@ const habitSchema = new mongoose.Schema(
 		},
 		completions: {
 			type: Map,
-			of: Boolean,
+			of: mongoose.Schema.Types.Mixed,
 			default: {},
 		},
 	},
