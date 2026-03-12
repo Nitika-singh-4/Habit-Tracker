@@ -203,36 +203,21 @@ const Dashboard = () => {
   const todayCompletedCount = countCompletedForDate(todayDate);
   const weekCompletedCount = countCompletedForWindow(7);
   const monthCompletedCount = countCompletedForWindow(30);
-  const todayChecklistTotal = goals.dailyItems.length;
-  const todayChecklistDone = goals.dailyItems.filter((item) => item.done).length;
-  const weeklyChecklistTotal = goals.weeklyItems.length;
-  const weeklyChecklistDone = goals.weeklyItems.filter((item) => item.done).length;
-  const monthlyChecklistTotal = goals.monthlyItems.length;
-  const monthlyChecklistDone = goals.monthlyItems.filter((item) => item.done).length;
 
   const safePercent = (value) => Math.max(0, Math.min(100, Math.round(value)));
-  const todayHabitProgress = habits.length
-    ? safePercent((todayCompletedCount / habits.length) * 100)
-    : 0;
-  const todayChecklistProgress = todayChecklistTotal > 0
-    ? safePercent((todayChecklistDone / todayChecklistTotal) * 100)
+  const todayGoalProgress = goals.daily > 0
+    ? safePercent((todayCompletedCount / goals.daily) * 100)
     : 0;
   const weeklyGoalProgress = goals.weekly > 0
     ? safePercent((weekCompletedCount / goals.weekly) * 100)
     : 0;
-  const weeklyChecklistProgress = weeklyChecklistTotal > 0
-    ? safePercent((weeklyChecklistDone / weeklyChecklistTotal) * 100)
-    : 0;
   const monthlyGoalProgress = goals.monthly > 0
     ? safePercent((monthCompletedCount / goals.monthly) * 100)
     : 0;
-  const monthlyChecklistProgress = monthlyChecklistTotal > 0
-    ? safePercent((monthlyChecklistDone / monthlyChecklistTotal) * 100)
-    : 0;
 
-  const todayProgress = todayChecklistTotal > 0 ? todayChecklistProgress : todayHabitProgress;
-  const weeklyProgress = weeklyChecklistTotal > 0 ? weeklyChecklistProgress : weeklyGoalProgress;
-  const monthlyProgress = monthlyChecklistTotal > 0 ? monthlyChecklistProgress : monthlyGoalProgress;
+  const todayProgress = todayGoalProgress;
+  const weeklyProgress = weeklyGoalProgress;
+  const monthlyProgress = monthlyGoalProgress;
 
   useEffect(() => {
     const loadGoals = async () => {
@@ -304,16 +289,16 @@ const Dashboard = () => {
     {
       title: 'Weekly Progress',
       percentage: weeklyProgress,
-      current: weeklyChecklistTotal > 0 ? weeklyChecklistDone : weekCompletedCount,
-      goal: weeklyChecklistTotal > 0 ? weeklyChecklistTotal : goals.weekly,
+      current: weekCompletedCount,
+      goal: goals.weekly,
       tone: 'from-violet-100 to-indigo-100',
       accent: 'bg-indigo-500',
     },
     {
       title: 'Monthly Progress',
       percentage: monthlyProgress,
-      current: monthlyChecklistTotal > 0 ? monthlyChecklistDone : monthCompletedCount,
-      goal: monthlyChecklistTotal > 0 ? monthlyChecklistTotal : goals.monthly,
+      current: monthCompletedCount,
+      goal: goals.monthly,
       tone: 'from-orange-100 to-amber-100',
       accent: 'bg-amber-500',
     },
@@ -415,8 +400,8 @@ const Dashboard = () => {
         <div className="mb-8 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
           <TodayProgressRing
             percentage={todayProgress}
-            completedCount={todayChecklistTotal > 0 ? todayChecklistDone : todayCompletedCount}
-            totalCount={todayChecklistTotal > 0 ? todayChecklistTotal : habits.length}
+            completedCount={todayCompletedCount}
+            totalCount={goals.daily}
           />
 
           {progressCards.map((card) => (
