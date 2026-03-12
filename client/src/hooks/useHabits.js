@@ -1,8 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { createHabit, getHabits, updateHabit } from '../services/habitService';
 
-const DEFAULT_MONTHLY_GOAL = 20;
-
 const getTodayDayNumber = () => {
   const day = new Date().getDay();
   return day === 0 ? 7 : day;
@@ -79,7 +77,6 @@ const habitToSubject = (habit) => {
   return {
     id: String(habit?._id || ''),
     name: String(habit?.name || '').trim(),
-    monthlyGoal: DEFAULT_MONTHLY_GOAL,
     topics,
   };
 };
@@ -204,7 +201,6 @@ const useHabits = () => {
     const optimisticSubject = {
       id: tempId,
       name: trimmedHabitName,
-      monthlyGoal: DEFAULT_MONTHLY_GOAL,
       topics: [],
     };
 

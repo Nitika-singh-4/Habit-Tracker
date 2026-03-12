@@ -855,7 +855,7 @@ const Dashboard = () => {
             </div>
             <div className="rounded-xl bg-indigo-100/70 p-3">
               <p className="text-xs font-semibold uppercase tracking-[0.08em] text-indigo-700">Monthly Goal</p>
-              <p className="mt-1 text-2xl font-black text-indigo-800">{monthlySummary.totals.monthlyGoal}</p>
+              <p className="mt-1 text-2xl font-black text-indigo-800">{effectiveMonthlyGoal}</p>
             </div>
           </div>
 

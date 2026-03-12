@@ -1,8 +1,3 @@
-const toSafeNumber = (value) => {
-	const parsed = Number(value);
-	return Number.isFinite(parsed) ? parsed : 0;
-};
-
 const normalizeMonthKey = (currentMonth) => {
 	if (typeof currentMonth === 'string' && /^\d{4}-\d{2}$/.test(currentMonth)) {
 		return currentMonth;
@@ -117,7 +112,6 @@ export const calculateMonthlyProgress = (subjects = []) => {
 		return {
 			id: String(subject?.id || ''),
 			name: String(subject?.name || 'Unknown Subject'),
-			monthlyGoal: toSafeNumber(subject?.monthlyGoal),
 			totalTopics,
 			completedTopics,
 			remainingTopics,
@@ -130,14 +124,12 @@ export const calculateMonthlyProgress = (subjects = []) => {
 			acc.totalTopics += subject.totalTopics;
 			acc.completedTopics += subject.completedTopics;
 			acc.remainingTopics += subject.remainingTopics;
-			acc.monthlyGoal += subject.monthlyGoal;
 			return acc;
 		},
 		{
 			totalTopics: 0,
 			completedTopics: 0,
 			remainingTopics: 0,
-			monthlyGoal: 0,
 		}
 	);
 
