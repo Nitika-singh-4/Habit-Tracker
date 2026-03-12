@@ -11,7 +11,39 @@ const app = express();
 const PORT = Number(process.env.PORT) || 5000;
 const MAX_PORT_RETRIES = 5;
 
-app.use(cors({ origin: process.env.CLIENT_URL || 'https://habit-tracker-snowy-psi.vercel.app/' }));
+const normalizeOrigin = (value) => String(value || '').trim().replace(/\/+$/, '');
+
+const configuredOrigins = (process.env.CLIENT_URL || 'http://localhost:5173')
+	.split(',')
+	.map(normalizeOrigin)
+	.filter(Boolean);
+
+const allowedOrigins = new Set(configuredOrigins);
+
+const isAllowedOrigin = (origin) => {
+	if (!origin) return true;
+
+	const normalizedOrigin = normalizeOrigin(origin);
+	if (allowedOrigins.has(normalizedOrigin)) return true;
+
+	try {
+		const { hostname } = new URL(normalizedOrigin);
+		return hostname.endsWith('.vercel.app');
+	} catch {
+		return false;
+	}
+};
+
+app.use(cors({
+	origin: (origin, callback) => {
+		if (isAllowedOrigin(origin)) {
+			callback(null, true);
+			return;
+		}
+
+		callback(new Error(`CORS blocked for origin: ${origin}`));
+	},
+}));
 app.use(express.json());
 
 app.get('/', (_req, res) => {
