@@ -277,6 +277,36 @@ const Dashboard = () => {
   }, [goals, goalsLoaded]);
 
   useEffect(() => {
+    if (!goalsLoaded) return;
+
+    setGoals((prev) => {
+      const next = { ...prev };
+      let changed = false;
+
+      const syncGoalWithChecklist = (type) => {
+        const itemsKey = `${type}Items`;
+        const checklistTotal = Array.isArray(prev[itemsKey]) ? prev[itemsKey].length : 0;
+
+        if (checklistTotal > 0 && Number(prev[type]) !== checklistTotal) {
+          next[type] = checklistTotal;
+          changed = true;
+        }
+      };
+
+      syncGoalWithChecklist('daily');
+      syncGoalWithChecklist('weekly');
+      syncGoalWithChecklist('monthly');
+
+      return changed ? next : prev;
+    });
+  }, [
+    goalsLoaded,
+    goals.dailyItems.length,
+    goals.weeklyItems.length,
+    goals.monthlyItems.length,
+  ]);
+
+  useEffect(() => {
     const intervalId = setInterval(() => {
       setQuoteIndex((current) => (current + 1) % motivationalQuotes.length);
     }, 4500);
@@ -479,6 +509,7 @@ const Dashboard = () => {
                 type="number"
                 min="0"
                 value={goals.daily}
+                disabled={goals.dailyItems.length > 0}
                 onChange={(event) =>
                   setGoals((prev) => ({
                     ...prev,
@@ -487,6 +518,11 @@ const Dashboard = () => {
                 }
                 className="h-11 w-full rounded-xl border border-sky-200 bg-white px-3 text-slate-800 outline-none transition focus:border-sky-300 focus:ring-4 focus:ring-sky-100"
               />
+              {goals.dailyItems.length > 0 ? (
+                <p className="mt-1 text-xs font-medium text-slate-500">
+                  Daily goal is auto-managed from checklist items.
+                </p>
+              ) : null}
               <div className="mt-2 flex gap-2">
                 <input
                   type="text"
@@ -584,6 +620,7 @@ const Dashboard = () => {
                 type="number"
                 min="0"
                 value={goals.weekly}
+                disabled={goals.weeklyItems.length > 0}
                 onChange={(event) =>
                   setGoals((prev) => ({
                     ...prev,
@@ -592,6 +629,11 @@ const Dashboard = () => {
                 }
                 className="h-11 w-full rounded-xl border border-violet-200 bg-white px-3 text-slate-800 outline-none transition focus:border-violet-300 focus:ring-4 focus:ring-violet-100"
               />
+              {goals.weeklyItems.length > 0 ? (
+                <p className="mt-1 text-xs font-medium text-slate-500">
+                  Weekly goal is auto-managed from checklist items.
+                </p>
+              ) : null}
               <div className="mt-2 flex gap-2">
                 <input
                   type="text"
@@ -641,6 +683,7 @@ const Dashboard = () => {
                 type="number"
                 min="0"
                 value={goals.monthly}
+                disabled={goals.monthlyItems.length > 0}
                 onChange={(event) =>
                   setGoals((prev) => ({
                     ...prev,
@@ -649,6 +692,11 @@ const Dashboard = () => {
                 }
                 className="h-11 w-full rounded-xl border border-amber-200 bg-white px-3 text-slate-800 outline-none transition focus:border-amber-300 focus:ring-4 focus:ring-amber-100"
               />
+              {goals.monthlyItems.length > 0 ? (
+                <p className="mt-1 text-xs font-medium text-slate-500">
+                  Monthly goal is auto-managed from checklist items.
+                </p>
+              ) : null}
               <div className="mt-2 flex gap-2">
                 <input
                   type="text"
